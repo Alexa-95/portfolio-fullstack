@@ -4,21 +4,14 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import { imagesOptimizer } from "@vinext/cloudflare/images/images-optimizer";
 
 export default defineConfig(({ command }) => {
-  const isProductionBuild = command === "build";
+  const isBuild = command === "build";
 
   return {
     plugins: [
       vinext({
-        ...(isProductionBuild
-          ? {
-              images: {
-                optimizer: imagesOptimizer(),
-              },
-            }
-          : {}),
+        ...(isBuild ? { images: { optimizer: imagesOptimizer() } } : {}),
       }),
-
-      ...(isProductionBuild
+      ...(isBuild
         ? [
             cloudflare({
               viteEnvironment: {
