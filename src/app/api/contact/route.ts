@@ -157,12 +157,15 @@ export async function POST(request: NextRequest) {
       200,
     );
   } catch (error) {
-    console.error(
-      "Contact request failed:",
-      error instanceof Error ? error.name : "Unknown",
-    );
+    console.error("Contact request failed:", {
+      name: error instanceof Error ? error.name : "Unknown",
+      message: error instanceof Error ? error.message : "Unknown",
+    });
+
     return json(
-      { error: "Unable to send right now. Please try again later." },
+      {
+        error: "Unable to send right now. Please try again later.",
+      },
       503,
     );
   }
