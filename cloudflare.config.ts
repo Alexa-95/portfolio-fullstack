@@ -46,8 +46,5 @@ export default defineConfig({
 
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: bindings.text("0x4AAAAAAFiy4359HfuGNaGN"),
     },
-    observability: {
-      enabled: true,
-    },
   }),
 });
