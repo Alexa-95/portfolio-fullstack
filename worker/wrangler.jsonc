@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "portfolio-contact",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "keep_vars": true,
+  "send_email": [
+    {
+      "name": "EMAIL",
+      "remote": true,
+    },
+  ],
+}
