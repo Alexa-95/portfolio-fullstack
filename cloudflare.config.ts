@@ -29,6 +29,11 @@ export default defineConfig({
 
       UPSTASH_REDIS_REST_TOKEN: bindings.secret(),
 
+      GMAIL_ADDRESS: bindings.secret(),
+      GOOGLE_CLIENT_ID: bindings.secret(),
+      GOOGLE_CLIENT_SECRET: bindings.secret(),
+      GOOGLE_REFRESH_TOKEN: bindings.secret(),
+
       CONTACT_WORKER_URL: bindings.text(
         "https://portfolio.sobanska.workers.dev",
       ),
@@ -40,6 +45,9 @@ export default defineConfig({
       ),
 
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: bindings.text("0x4AAAAAAFiy4359HfuGNaGN"),
+    },
+    observability: {
+      enabled: true,
     },
   }),
 });

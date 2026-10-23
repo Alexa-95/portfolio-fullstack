@@ -63,9 +63,18 @@ export default {
         replyTo:email,
       });
       return reply(200, {success:true});
-    } catch {
-      console.error('Email delivery failed');
-      return reply(503, {error:'Email delivery unavailable'});
+    } catch(error) {
+        const err = error as Error & { code?: string };
+
+        console.error("Email delivery failed:", {
+          name: err?.name ?? "Unknown",
+          code: err?.code ?? "Unknown",
+          message: err?.message ?? "Unknown",
+        });
+
+        return reply(503, {
+          error: "Email delivery unavailable",
+        });
     }
   },
 };
