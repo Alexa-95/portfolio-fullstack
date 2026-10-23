@@ -34,6 +34,21 @@ function getConfig() {
 
   const bindings = env as unknown as Record<ConfigKey, string | undefined>;
 
+  console.log("Cloudflare environment diagnostics:", {
+    keys: Object.keys(env).filter((key) =>
+      [
+        "SITE_URL",
+        "TURNSTILE_SECRET_KEY",
+        "TURNSTILE_EXPECTED_HOSTNAME",
+        "CONTACT_WORKER_URL",
+        "CONTACT_WORKER_SECRET",
+        "UPSTASH_REDIS_REST_URL",
+        "UPSTASH_REDIS_REST_TOKEN",
+      ].includes(key),
+    ),
+    hasSiteUrl: typeof env.SITE_URL === "string",
+  });
+
   const missingKeys = keys.filter((key) => !bindings[key]);
 
   if (missingKeys.length > 0) {
