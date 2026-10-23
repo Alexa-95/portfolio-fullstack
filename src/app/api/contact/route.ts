@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 import { contactSchema } from "@/lib/contact";
+import { env } from "cloudflare:workers";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,6 +18,7 @@ function json(
     headers: { "Cache-Control": "no-store", ...extra },
   });
 }
+
 function getConfig() {
   const keys = [
     "SITE_URL",
@@ -27,21 +29,27 @@ function getConfig() {
     "UPSTASH_REDIS_REST_URL",
     "UPSTASH_REDIS_REST_TOKEN",
   ] as const;
-  const missingKeys = keys.filter((key) => !process.env[key]);
+
+  type ConfigKey = (typeof keys)[number];
+
+  const bindings = env as unknown as Record<ConfigKey, string | undefined>;
+
+  const missingKeys = keys.filter((key) => !bindings[key]);
 
   if (missingKeys.length > 0) {
     console.error("Missing contact configuration:", missingKeys.join(", "));
 
     return null;
   }
+
   return {
-    siteUrl: process.env.SITE_URL!,
-    secret: process.env.TURNSTILE_SECRET_KEY!,
-    hostname: process.env.TURNSTILE_EXPECTED_HOSTNAME!,
-    workerUrl: process.env.CONTACT_WORKER_URL!,
-    workerSecret: process.env.CONTACT_WORKER_SECRET!,
-    url: process.env.UPSTASH_REDIS_REST_URL!,
-    redisToken: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    siteUrl: bindings.SITE_URL!,
+    secret: bindings.TURNSTILE_SECRET_KEY!,
+    hostname: bindings.TURNSTILE_EXPECTED_HOSTNAME!,
+    workerUrl: bindings.CONTACT_WORKER_URL!,
+    workerSecret: bindings.CONTACT_WORKER_SECRET!,
+    url: bindings.UPSTASH_REDIS_REST_URL!,
+    redisToken: bindings.UPSTASH_REDIS_REST_TOKEN!,
   };
 }
 
