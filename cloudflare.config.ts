@@ -14,6 +14,26 @@ export default defineConfig({
     env: {
       ASSETS: bindings.assets(),
       IMAGES: bindings.images(),
+
+      SITE_URL: bindings.text("https://portfolio.sobanska.workers.dev"),
+
+      TURNSTILE_EXPECTED_HOSTNAME: bindings.text(
+        "portfolio.sobanska.workers.dev",
+      ),
+
+      TURNSTILE_SECRET_KEY: bindings.secret(),
+
+      UPSTASH_REDIS_REST_URL: bindings.text(
+        "https://modest-hamster-43752.upstash.io",
+      ),
+
+      UPSTASH_REDIS_REST_TOKEN: bindings.secret(),
+
+      CONTACT_WORKER_URL: bindings.text(
+        "https://portfolio.sobanska.workers.dev",
+      ),
+
+      CONTACT_WORKER_SECRET: bindings.secret(),
     },
   }),
 });
