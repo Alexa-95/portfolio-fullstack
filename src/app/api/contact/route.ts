@@ -16,6 +16,7 @@ const REQUIRED_KEYS = [
   "UPSTASH_REDIS_REST_URL",
   "UPSTASH_REDIS_REST_TOKEN",
   "GMAIL_ADDRESS",
+  "GMAIL_TO",
   "GOOGLE_CLIENT_ID",
   "GOOGLE_CLIENT_SECRET",
   "GOOGLE_REFRESH_TOKEN",
@@ -60,6 +61,7 @@ function getConfig() {
     redisUrl: bindings.UPSTASH_REDIS_REST_URL!,
     redisToken: bindings.UPSTASH_REDIS_REST_TOKEN!,
     gmailAddress: bindings.GMAIL_ADDRESS!,
+    gmailTo: bindings.GMAIL_TO!,
     googleClientId: bindings.GOOGLE_CLIENT_ID!,
     googleClientSecret: bindings.GOOGLE_CLIENT_SECRET!,
     googleRefreshToken: bindings.GOOGLE_REFRESH_TOKEN!,
@@ -141,7 +143,7 @@ async function sendEmail(config: Config, contact: Contact): Promise<void> {
 
   const mime = [
     `From: <${config.gmailAddress}>`,
-    `To: <${config.gmailAddress}>`,
+    `To: <${config.gmailTo}>`,
     "Subject: Nowa wiadomosc z portfolio",
     "MIME-Version: 1.0",
     "Content-Type: text/plain; charset=UTF-8",

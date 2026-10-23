@@ -30,6 +30,7 @@ export default defineConfig({
       UPSTASH_REDIS_REST_TOKEN: bindings.secret(),
 
       GMAIL_ADDRESS: bindings.secret(),
+      GMAIL_TO: bindings.secret(),
       GOOGLE_CLIENT_ID: bindings.secret(),
       GOOGLE_CLIENT_SECRET: bindings.secret(),
       GOOGLE_REFRESH_TOKEN: bindings.secret(),
