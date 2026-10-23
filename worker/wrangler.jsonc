@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "portfolio-fullstack",
+  "name": "portfolio-contact",
   "main": "src/index.ts",
   "compatibility_date": "2026-10-01",
   "keep_vars": true,
