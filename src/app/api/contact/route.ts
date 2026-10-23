@@ -12,7 +12,13 @@ function json(body: object, status: number, extra: Record<string,string> = {}) {
 }
 function getConfig() {
   const keys = ['SITE_URL','TURNSTILE_SECRET_KEY','TURNSTILE_EXPECTED_HOSTNAME','CONTACT_WORKER_URL','CONTACT_WORKER_SECRET','UPSTASH_REDIS_REST_URL','UPSTASH_REDIS_REST_TOKEN'] as const;
-  if (keys.some(key => !process.env[key])) return null;
+  const missingKeys = keys.filter((key) => !process.env[key]);
+
+  if (missingKeys.length > 0) {
+    console.error("Missing contact configuration:", missingKeys.join(", "));
+
+    return null;
+  }
   return {
     siteUrl: process.env.SITE_URL!, secret:process.env.TURNSTILE_SECRET_KEY!, hostname:process.env.TURNSTILE_EXPECTED_HOSTNAME!,
     workerUrl:process.env.CONTACT_WORKER_URL!, workerSecret:process.env.CONTACT_WORKER_SECRET!,
