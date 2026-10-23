@@ -34,6 +34,12 @@ export default defineConfig({
       ),
 
       CONTACT_WORKER_SECRET: bindings.secret(),
+
+      NEXT_PUBLIC_SITE_URL: bindings.text(
+        "https://portfolio.sobanska.workers.dev",
+      ),
+
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: bindings.text("0x4AAAAAAFiy4359HfuGNaGN"),
     },
   }),
 });
