@@ -260,12 +260,16 @@ export async function POST(request: NextRequest) {
     const validation = contactSchema.safeParse(input);
 
     if (!validation.success) {
-      return json(
-        {
-          error: "Please check your form fields.",
-        },
-        400,
+      console.error(
+        "Contact validation failed:",
+        validation.error.issues.map((issue: { path: any[]; code: any; message: any; }) => ({
+          field: issue.path.join("."),
+          code: issue.code,
+          message: issue.message,
+        })),
       );
+
+      return json({ error: "Please check your form fields." }, 400);
     }
 
     const { name, email, message, token } = validation.data;
