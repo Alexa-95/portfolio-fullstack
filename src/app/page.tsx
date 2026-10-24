@@ -1,119 +1,11 @@
-import {
-  ArrowDownRight,
-  ArrowRight,
-  ArrowUpRight,
-  Github,
-  Linkedin,
-  Menu,
-} from "lucide-react";
+import Link from "next/link";
+import { ArrowDownRight, ArrowRight, ArrowUpRight } from "lucide-react";
 import { ContactForm } from "@/components/contact-form";
+import { ProjectVisual } from "@/components/project-visual";
 import { Reveal } from "@/components/reveal";
+import { SectionLabel, SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { profile, projects, skills } from "@/lib/content";
 
-function SectionLabel({
-  index,
-  children,
-}: {
-  index: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="section-label">
-      <span>{index}</span>
-      <span>{children}</span>
-      <span className="label-spark">✳</span>
-    </div>
-  );
-}
-function ProjectVisual({ kind }: { kind: string }) {
-  if (kind === "maison")
-    return (
-      <div className="project-art maison-art">
-        <div className="mock-browser">
-          <span>● ● ●</span>
-          <span>maison / collection</span>
-          <span>↗</span>
-        </div>
-        <div className="maison-head">
-          THE ART OF
-          <br />
-          <em>living well.</em>
-        </div>
-        <div className="maison-items">
-          <div>
-            <span>FORM 01</span>
-          </div>
-          <div>
-            <span>FORM 02</span>
-          </div>
-          <div>
-            <span>FORM 03</span>
-          </div>
-        </div>
-        <div className="art-bottom">
-          A curated world of beautiful things. <span>DISCOVER →</span>
-        </div>
-      </div>
-    );
-  if (kind === "forma")
-    return (
-      <div className="project-art forma-art">
-        <div className="forma-side">
-          <b>forma ✳</b>
-          <span>✦ Overview</span>
-          <span>▦ Boards</span>
-          <span>◷ Calendar</span>
-          <span>◎ Team</span>
-        </div>
-        <div className="forma-main">
-          <div className="forma-top">
-            MONDAY, MAY 12 <span>◉ ◉</span>
-          </div>
-          <h3>
-            Make room for
-            <br />
-            <em>what matters.</em>
-          </h3>
-          <div className="forma-progress">
-            <span>Weekly intentions</span>
-            <b>68%</b>
-            <div>
-              <i />
-            </div>
-          </div>
-          <div className="forma-tasks">
-            <span>○ Refine product experience</span>
-            <span>◉ Ship the little details</span>
-            <span>○ Review design system</span>
-          </div>
-        </div>
-      </div>
-    );
-  return (
-    <div className="project-art bloom-art">
-      <div className="bloom-top">
-        bloom<span>ANALYTICS / OVERVIEW</span>◈
-      </div>
-      <div className="bloom-hero">
-        A clearer view
-        <br />
-        <em>of what grows.</em>
-      </div>
-      <div className="bloom-panels">
-        <div>
-          <small>ACTIVE USERS</small>
-          <strong>24.8k</strong>
-          <span>↗ +12.4%</span>
-        </div>
-        <div className="bloom-bars">
-          {[32, 57, 44, 76, 61, 86, 70, 94, 78, 100].map((h, i) => (
-            <i key={i} style={{ height: `${h}%` }} />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 function ProjectCard({
   project,
   index,
@@ -121,25 +13,36 @@ function ProjectCard({
   project: (typeof projects)[number];
   index: number;
 }) {
+  const href = `/projects/${project.slug}`;
+
   return (
     <Reveal delay={index * 0.08}>
       <article
         className={`project-card ${index % 2 === 1 ? "project-card-offset" : ""}`}
       >
-        <ProjectVisual kind={project.className} />
+        {/* Duplicate link for mouse users; the title link serves keyboards. */}
+        <Link href={href} tabIndex={-1} aria-hidden className="project-art-link">
+          <ProjectVisual kind={project.className} />
+        </Link>
         <div className="project-meta">
           <span>{project.tag}</span>
-          <span>{project.number} / 03</span>
+          <span>
+            {project.number} / {String(projects.length).padStart(2, "0")}
+          </span>
         </div>
         <div className="project-heading">
           <div>
             <h3>
-              {project.title}
-              <span className="title-star">✳</span>
+              <Link href={href}>
+                {project.title}
+                <span className="title-star">✳</span>
+              </Link>
             </h3>
             <p className="project-subtitle">{project.subtitle}</p>
           </div>
-          <ArrowUpRight strokeWidth={1.1} size={30} aria-hidden />
+          <Link href={href} tabIndex={-1} aria-hidden className="project-arrow">
+            <ArrowUpRight strokeWidth={1.1} size={30} />
+          </Link>
         </div>
         <p className="project-description">{project.description}</p>
         <div className="project-tags">
@@ -172,23 +75,7 @@ function ProjectCard({
 export default function Home() {
   return (
     <>
-      <header className="site-header container">
-        <a className="wordmark" href="#top" aria-label="Back to top">
-          yourname<span>.dev</span>
-          <i>✳</i>
-        </a>
-        <nav className="desktop-nav" aria-label="Main navigation">
-          <a href="#work">Work</a>
-          <a href="#about">About</a>
-          <a href="#toolkit">Toolkit</a>
-          <a href="#contact" className="nav-contact">
-            Let&apos;s talk <ArrowUpRight size={15} />
-          </a>
-        </nav>
-        <a href="#contact" className="mobile-menu" aria-label="Go to contact">
-          <Menu size={23} />
-        </a>
-      </header>
+      <SiteHeader />
       <main id="top">
         <section className="hero container">
           <div className="hero-copy">
@@ -267,10 +154,6 @@ export default function Home() {
                 <ProjectCard key={p.number} project={p} index={i} />
               ))}
             </div>
-            <p className="project-disclaimer">
-              * These are illustrative concept projects. Replace them with your
-              actual work before publishing your portfolio.
-            </p>
           </div>
         </section>
         <section id="about" className="about-section section-pad">
@@ -306,8 +189,8 @@ export default function Home() {
                 underneath.
               </p>
               <p>
-                I&apos;m curious by nature, detail-oriented by choice, and always
-                looking for ways to turn complex ideas into approachable
+                I&apos;m curious by nature, detail-oriented by choice, and
+                always looking for ways to turn complex ideas into approachable
                 experiences.
               </p>
               <div className="about-signature">
@@ -420,36 +303,7 @@ export default function Home() {
           </div>
         </section>
       </main>
-      <footer className="site-footer">
-        <div className="container footer-inner">
-          <a className="wordmark" href="#top">
-            yourname<span>.dev</span>
-            <i>✳</i>
-          </a>
-          <span>© {new Date().getFullYear()} — CRAFTED WITH CARE</span>
-          <div>
-            <a
-              href={profile.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="GitHub"
-            >
-              <Github size={19} />
-            </a>
-            <a
-              href={profile.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="LinkedIn"
-            >
-              <Linkedin size={19} />
-            </a>
-            <a href="#top" aria-label="Back to top">
-              ↑
-            </a>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }
