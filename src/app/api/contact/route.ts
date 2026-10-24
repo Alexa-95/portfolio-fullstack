@@ -15,14 +15,22 @@ const REQUIRED_KEYS = [
   "TURNSTILE_EXPECTED_HOSTNAME",
   "UPSTASH_REDIS_REST_URL",
   "UPSTASH_REDIS_REST_TOKEN",
-  "GMAIL_ADDRESS",
-  "GMAIL_TO",
-  "GOOGLE_CLIENT_ID",
-  "GOOGLE_CLIENT_SECRET",
-  "GOOGLE_REFRESH_TOKEN",
+  "EMAIL_FROM",
+  "EMAIL_TO",
 ] as const;
 
 type ConfigKey = (typeof REQUIRED_KEYS)[number];
+
+// Cloudflare Email Service binding (send_email).
+interface EmailBinding {
+  send(message: {
+    from: string | { email: string; name?: string };
+    to: string;
+    subject: string;
+    text: string;
+    replyTo?: string | { email: string; name?: string };
+  }): Promise<{ messageId: string }>;
+}
 
 type Contact = {
   name: string;
@@ -45,9 +53,17 @@ function json(
 }
 
 function getConfig() {
-  const bindings = env as unknown as Record<ConfigKey, string | undefined>;
+  const bindings = env as unknown as Record<ConfigKey, string | undefined> & {
+    EMAIL?: EmailBinding;
+  };
 
-  const missing = REQUIRED_KEYS.filter((key) => !bindings[key]?.trim());
+  const missing: string[] = REQUIRED_KEYS.filter(
+    (key) => !bindings[key]?.trim(),
+  );
+
+  if (!bindings.EMAIL) {
+    missing.push("EMAIL");
+  }
 
   if (missing.length > 0) {
     console.error("Missing contact configuration:", missing.join(", "));
@@ -60,77 +76,16 @@ function getConfig() {
     turnstileHostname: bindings.TURNSTILE_EXPECTED_HOSTNAME!,
     redisUrl: bindings.UPSTASH_REDIS_REST_URL!,
     redisToken: bindings.UPSTASH_REDIS_REST_TOKEN!,
-    gmailAddress: bindings.GMAIL_ADDRESS!,
-    gmailTo: bindings.GMAIL_TO!,
-    googleClientId: bindings.GOOGLE_CLIENT_ID!,
-    googleClientSecret: bindings.GOOGLE_CLIENT_SECRET!,
-    googleRefreshToken: bindings.GOOGLE_REFRESH_TOKEN!,
+    email: bindings.EMAIL!,
+    emailFrom: bindings.EMAIL_FROM!,
+    emailTo: bindings.EMAIL_TO!,
   };
 }
 
 type Config = NonNullable<ReturnType<typeof getConfig>>;
 
-function toBase64Url(input: string): string {
-  const bytes = new TextEncoder().encode(input);
-
-  let binary = "";
-
-  for (const byte of bytes) {
-    binary += String.fromCharCode(byte);
-  }
-
-  return btoa(binary)
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
-}
-
-function toBase64(input: string): string {
-  const bytes = new TextEncoder().encode(input);
-
-  let binary = "";
-
-  for (const byte of bytes) {
-    binary += String.fromCharCode(byte);
-  }
-
-  return btoa(binary);
-}
-
 async function sendEmail(config: Config, contact: Contact): Promise<void> {
-  // 1. Get a short-lived Google access token.
-  const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      client_id: config.googleClientId,
-      client_secret: config.googleClientSecret,
-      refresh_token: config.googleRefreshToken,
-      grant_type: "refresh_token",
-    }),
-    signal: AbortSignal.timeout(10000),
-    cache: "no-store",
-  });
-
-  if (!tokenResponse.ok) {
-    console.error("Gmail OAuth failed:", {
-      status: tokenResponse.status,
-    });
-    throw new Error("Gmail OAuth failed");
-  }
-
-  const token = (await tokenResponse.json()) as {
-    access_token?: string;
-  };
-
-  if (!token.access_token) {
-    throw new Error("Gmail access token missing");
-  }
-
-  // 2. Build a UTF-8 MIME email.
-  // User data stays in the body, not email headers.
+  // User data stays in the body; Reply-To lets a Gmail reply go to the sender.
   const text = [
     "Nowa wiadomość z portfolio",
     "",
@@ -141,39 +96,24 @@ async function sendEmail(config: Config, contact: Contact): Promise<void> {
     contact.message,
   ].join("\n");
 
-  const mime = [
-    `From: <${config.gmailAddress}>`,
-    `To: <${config.gmailTo}>`,
-    "Subject: Nowa wiadomosc z portfolio",
-    "MIME-Version: 1.0",
-    "Content-Type: text/plain; charset=UTF-8",
-    "Content-Transfer-Encoding: base64",
-    "",
-    toBase64(text),
-  ].join("\r\n");
-
-  // 3. Send through the Gmail API.
-  const sendResponse = await fetch(
-    "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token.access_token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        raw: toBase64Url(mime),
-      }),
-      signal: AbortSignal.timeout(15000),
-      cache: "no-store",
-    },
-  );
-
-  if (!sendResponse.ok) {
-    console.error("Gmail send failed:", {
-      status: sendResponse.status,
+  try {
+    await config.email.send({
+      from: { email: config.emailFrom, name: "Portfolio" },
+      to: config.emailTo,
+      subject: "Nowa wiadomość z portfolio",
+      text,
+      replyTo: { email: contact.email, name: contact.name },
     });
-    throw new Error("Gmail delivery failed");
+  } catch (error) {
+    const err = error as Error & { code?: string };
+
+    console.error("Email delivery failed:", {
+      name: err?.name ?? "Unknown",
+      code: err?.code ?? "Unknown",
+      message: err?.message ?? "Unknown",
+    });
+
+    throw new Error("Email delivery failed");
   }
 }
 
@@ -330,7 +270,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Send from this same Cloudflare Worker.
+    // 4. Send via the Cloudflare Email Service binding.
     await sendEmail(config, {
       name,
       email,

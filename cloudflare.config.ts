@@ -30,15 +30,14 @@ export default defineConfig({
 
       UPSTASH_REDIS_REST_TOKEN: bindings.secret(),
 
-      GMAIL_ADDRESS: bindings.secret(),
-      GMAIL_TO: bindings.secret(),
-      GOOGLE_CLIENT_ID: bindings.secret(),
-      GOOGLE_CLIENT_SECRET: bindings.secret(),
-      GOOGLE_REFRESH_TOKEN: bindings.secret(),
-
-      CONTACT_WORKER_URL: bindings.text("https://datenshi.dev"),
-
-      CONTACT_WORKER_SECRET: bindings.secret(),
+      // Cloudflare Email Service: the binding may only send form@ -> contact@.
+      // contact@ is forwarded to Gmail by Email Routing.
+      EMAIL: bindings.sendEmail({
+        allowedSenderAddresses: ["form@datenshi.dev"],
+        allowedDestinationAddresses: ["contact@datenshi.dev"],
+      }),
+      EMAIL_FROM: bindings.text("form@datenshi.dev"),
+      EMAIL_TO: bindings.text("contact@datenshi.dev"),
 
       NEXT_PUBLIC_SITE_URL: bindings.text("https://datenshi.dev"),
 

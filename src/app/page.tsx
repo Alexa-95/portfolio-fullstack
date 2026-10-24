@@ -311,7 +311,7 @@ export default function Home() {
                 experiences.
               </p>
               <div className="about-signature">
-                With care, <span>your name ✳</span>
+                With care, <span>Aleksandra</span>
               </div>
             </Reveal>
           </div>
