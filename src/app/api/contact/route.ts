@@ -264,7 +264,7 @@ export async function POST(request: NextRequest) {
     if (!validation.success) {
       console.error(
         "Contact validation failed:",
-        validation.error.issues.map((issue: { path: any[]; code: any; message: any; }) => ({
+        validation.error.issues.map((issue) => ({
           field: issue.path.join("."),
           code: issue.code,
           message: issue.message,
@@ -274,7 +274,20 @@ export async function POST(request: NextRequest) {
       return json({ error: "Please check your form fields." }, 400);
     }
 
-    const { name, email, message, token } = validation.data;
+    const { name, email, message, company, token } = validation.data;
+
+    // Honeypot filled: pretend success so bots learn nothing.
+    if (company.length > 0) {
+      console.warn("Contact honeypot triggered");
+
+      return json(
+        {
+          success: true,
+          message: "Your message has been sent. Thank you!",
+        },
+        200,
+      );
+    }
 
     // 3. Verify Turnstile.
     const turnstileResponse = await fetch(

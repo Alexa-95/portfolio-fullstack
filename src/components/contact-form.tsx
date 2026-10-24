@@ -17,6 +17,22 @@ export function ContactForm() {
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (loading || !token) return;
+    // Mirror the server rules (it trims and requires a domain with a dot).
+    if (name.trim().length < 2) {
+      setStatus("error");
+      setFeedback("Please enter your name (at least 2 characters).");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) {
+      setStatus("error");
+      setFeedback("Please enter a valid email address, e.g. jane@example.com.");
+      return;
+    }
+    if (message.trim().length < 10) {
+      setStatus("error");
+      setFeedback("Your message should be at least 10 characters long.");
+      return;
+    }
     setLoading(true);
     setStatus("idle");
     setFeedback("");
@@ -24,7 +40,13 @@ export function ContactForm() {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message, company, token }),
+        body: JSON.stringify({
+          name,
+          email: email.trim(),
+          message,
+          company,
+          token,
+        }),
       });
       const result: { error?: string; message?: string; success?: boolean } =
         await response.json();
@@ -94,10 +116,11 @@ export function ContactForm() {
         placeholder="Tell me a little about your idea..."
       />
       <div className="honeypot" aria-hidden="true">
-        <label htmlFor="contact-company">Leave this field empty</label>
+        <label htmlFor="contact-hp">Leave this field empty</label>
+        {/* Not named "company": browsers autofill that from saved profiles. */}
         <input
-          id="contact-company"
-          name="company"
+          id="contact-hp"
+          name="hp_field"
           tabIndex={-1}
           autoComplete="off"
           value={company}
