@@ -1,4 +1,6 @@
 import type { NextConfig } from 'next';
+// React needs eval() in development for debugging features; production never uses it
+const devEval = process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : '';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -8,7 +10,7 @@ const nextConfig: NextConfig = {
       {key:'Referrer-Policy',value:'strict-origin-when-cross-origin'},
       {key:'X-Frame-Options',value:'DENY'},
       {key:'Permissions-Policy',value:'camera=(), microphone=(), geolocation=()'},
-      {key:'Content-Security-Policy',value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"}
+      {key:'Content-Security-Policy',value: `default-src 'self'; script-src 'self' 'unsafe-inline'${devEval} https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests`}
     ]}];
   }
 };
