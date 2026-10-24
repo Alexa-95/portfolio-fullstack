@@ -11,15 +11,14 @@ export default defineConfig({
       notFoundHandling: "none",
       runWorkerFirst: ["/*", "!/_next/static/*", "!/*/_next/static/*"],
     },
+    domains: ["datenshi.dev", "www.datenshi.dev"],
     env: {
       ASSETS: bindings.assets(),
       IMAGES: bindings.images(),
 
-      SITE_URL: bindings.text("https://portfolio.sobanska.workers.dev"),
+      SITE_URL: bindings.text("https://datenshi.dev"),
 
-      TURNSTILE_EXPECTED_HOSTNAME: bindings.text(
-        "portfolio.sobanska.workers.dev",
-      ),
+      TURNSTILE_EXPECTED_HOSTNAME: bindings.text("datenshi.dev"),
 
       TURNSTILE_SECRET_KEY: bindings.secret(),
 
@@ -35,15 +34,11 @@ export default defineConfig({
       GOOGLE_CLIENT_SECRET: bindings.secret(),
       GOOGLE_REFRESH_TOKEN: bindings.secret(),
 
-      CONTACT_WORKER_URL: bindings.text(
-        "https://portfolio.sobanska.workers.dev",
-      ),
+      CONTACT_WORKER_URL: bindings.text("https://datenshi.dev"),
 
       CONTACT_WORKER_SECRET: bindings.secret(),
 
-      NEXT_PUBLIC_SITE_URL: bindings.text(
-        "https://portfolio.sobanska.workers.dev",
-      ),
+      NEXT_PUBLIC_SITE_URL: bindings.text("https://datenshi.dev"),
 
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: bindings.text("0x4AAAAAAFiy4359HfuGNaGN"),
     },
