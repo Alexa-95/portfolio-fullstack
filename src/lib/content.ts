@@ -74,39 +74,39 @@ export const projects = [
       },
     ],
   },
-  // {
-  //   slug: "bloom",
-  //   number: "03",
-  //   tag: "WEB APP · DASHBOARD",
-  //   title: "Bloom",
-  //   subtitle: "Making data feel effortless.",
-  //   description:
-  //     "An analytics dashboard concept designed for clarity, accessibility and expressive data storytelling.",
-  //   stack: ["Next.js", "REST API", "Charts"],
-  //   className: "bloom",
-  //   demo: "",
-  //   github: "",
-  //   year: "2026",
-  //   role: "Data visualisation & frontend architecture",
-  //   overview: [
-  //     "Bloom turns product analytics into something people actually want to open. Each view leads with one clear answer and lets the details unfold only when you ask for them.",
-  //     "Charts are built to be read by everyone: colour is never the only signal, every chart has a text summary, and the whole dashboard works with a keyboard.",
-  //   ],
-  //   features: [
-  //     {
-  //       title: "Accessible charts",
-  //       text: "Patterns, labels and summaries make every chart understandable without relying on colour.",
-  //     },
-  //     {
-  //       title: "Composable widgets",
-  //       text: "Panels share one data contract, so new views are assembled rather than rebuilt.",
-  //     },
-  //     {
-  //       title: "Typed REST layer",
-  //       text: "A thin API client validates responses before they ever reach a chart.",
-  //     },
-  //   ],
-  // },
+  {
+    slug: "chapterly",
+    number: "03",
+    tag: "FULLSTACK · READING",
+    title: "Chapterly",
+    subtitle: "A home for every book you read.",
+    description:
+      "A reading journal for tracking books, progress, ratings and reviews, with shelves, yearly goals and reading stats.",
+    stack: ["Next.js", "TypeScript", "Cloudflare D1", "Drizzle ORM", "Open Library API", "Google Books API"],
+    className: "chapterly",
+    demo: "",
+    github: "https://github.com/Alexa-95/chapterly",
+    year: "2026",
+    role: "Design & fullstack development",
+    overview: [
+      "Chapterly is a personal reading journal. Books are found through a search, placed on shelves and followed from the moment they are added, through the pages read, to a finished book with a rating and a review.",
+      "It is built with Next.js 16, the App Router and Server Actions, and runs on Cloudflare Workers through OpenNext. Data lives in a Cloudflare D1 database modelled with Drizzle ORM and versioned migrations, while book details come from Open Library, with Google Books as a fallback.",
+    ],
+    features: [
+      {
+        title: "Two-source book search",
+        text: "Open Library is queried first for its better coverage of Polish books, and Google Books takes over when it fails.",
+      },
+      {
+        title: "Shelves & reading progress",
+        text: "Every book has a status (want to read, reading, read), a current page and any number of custom shelves.",
+      },
+      {
+        title: "Goals, stats & history",
+        text: "A yearly reading goal, books finished per year, pages read per month and a log of every reading activity.",
+      },
+    ],
+  },
 ];
 
 export function getProject(slug: string) {
