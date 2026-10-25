@@ -2,8 +2,12 @@
 import { useRef, useState, type FormEvent } from "react";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { ArrowUpRight, CheckCircle2 } from "lucide-react";
+import { buttonDark, mono } from "@/lib/styles";
 
 const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+const label = "mt-[17px] mb-2 text-sm font-bold text-plum-muted";
+const field =
+  "w-full rounded-none border-b border-line-rose bg-transparent px-px pt-2.5 pb-3.5 text-md text-plum-soft outline-0 placeholder:text-taupe-light focus:border-b-2 focus:border-wine";
 export function ContactForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -72,9 +76,9 @@ export function ContactForm() {
     }
   }
   return (
-    <form onSubmit={send} className="contact-form">
-      <label htmlFor="contact-name">
-        Your name <span>*</span>
+    <form onSubmit={send} className="flex flex-col pt-5">
+      <label htmlFor="contact-name" className={label}>
+        Your name <span className="text-rose-dark">*</span>
       </label>
       <input
         id="contact-name"
@@ -86,9 +90,10 @@ export function ContactForm() {
         minLength={2}
         maxLength={80}
         placeholder="Jane Doe"
+        className={field}
       />
-      <label htmlFor="contact-email">
-        Your email <span>*</span>
+      <label htmlFor="contact-email" className={label}>
+        Your email <span className="text-rose-dark">*</span>
       </label>
       <input
         id="contact-email"
@@ -100,9 +105,10 @@ export function ContactForm() {
         required
         maxLength={254}
         placeholder="jane@example.com"
+        className={field}
       />
-      <label htmlFor="contact-message">
-        Your message <span>*</span>
+      <label htmlFor="contact-message" className={label}>
+        Your message <span className="text-rose-dark">*</span>
       </label>
       <textarea
         id="contact-message"
@@ -114,8 +120,9 @@ export function ContactForm() {
         maxLength={3000}
         rows={4}
         placeholder="Tell me a little about your idea..."
+        className={`${field} resize-y`}
       />
-      <div className="honeypot" aria-hidden="true">
+      <div className="sr-only" aria-hidden="true">
         <label htmlFor="contact-hp">Leave this field empty</label>
         {/* Not named "company": browsers autofill that from saved profiles. */}
         <input
@@ -128,7 +135,7 @@ export function ContactForm() {
         />
       </div>
       {siteKey ? (
-        <div className="captcha">
+        <div className="mt-6 min-h-[55px]">
           <Turnstile
             ref={captcha}
             siteKey={siteKey}
@@ -139,25 +146,27 @@ export function ContactForm() {
           />
         </div>
       ) : (
-        <p className="form-config">
+        <p className="mt-4 text-sm text-error">
           Contact form setup is required. Add your Turnstile keys to enable
           sending.
         </p>
       )}
       <button
         type="submit"
-        className="button button-dark form-submit"
+        className={`${buttonDark} mt-6 w-full justify-between`}
         disabled={loading || !token || !siteKey}
       >
         {loading ? "Sending…" : "Send a little hello"}{" "}
         <ArrowUpRight size={17} />
       </button>
-      <p className="form-privacy">
+      <p
+        className={`${mono} mt-[18px] text-center text-3xs leading-[1.7] text-taupe-gray`}
+      >
         Your message goes directly to my inbox. No marketing, no spam.
       </p>
       {feedback && (
         <div
-          className={`form-feedback ${status}`}
+          className={`mt-3.5 flex items-center gap-[7px] p-3 text-sm leading-[1.6] ${status === "success" ? "bg-success-bg text-success" : "bg-error-bg text-error"}`}
           role="status"
           aria-live="polite"
         >
