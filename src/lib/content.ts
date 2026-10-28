@@ -1,7 +1,9 @@
 export const profile = {
   name: "Aleksandra Sobańska",
   title: "Fullstack Developer",
-  email: "contact@datenshi.dev",
+  // Split so the full address is never in the server HTML.
+  emailUser: "contact",
+  emailDomain: "datenshi.dev",
   location: "Based in Europe · Available worldwide",
   github: "https://github.com/Alexa-95",
   linkedin: "https://www.linkedin.com/in/aleksandra-sobanska/",

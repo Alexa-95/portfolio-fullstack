@@ -3,11 +3,20 @@ import { env } from "cloudflare:workers";
 import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 import { contactSchema } from "@/lib/contact";
+import { acceptsMail, emailDomain, spamReason } from "@/lib/spam";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const MAX_BYTES = 12_000;
+
+// Humans need longer than this to fill the form.
+const MIN_FILL_MS = 3_000;
+
+const SENT = {
+  success: true,
+  message: "Your message has been sent. Thank you!",
+};
 
 const REQUIRED_KEYS = [
   "SITE_URL",
@@ -274,18 +283,31 @@ export async function POST(request: NextRequest) {
       return json({ error: "Please check your form fields." }, 400);
     }
 
-    const { name, email, message, company, token } = validation.data;
+    const { name, email, message, company, token, elapsed } = validation.data;
 
-    // Honeypot filled: pretend success so bots learn nothing.
+    // Bot signals: pretend success so bots learn nothing.
     if (company.length > 0) {
       console.warn("Contact honeypot triggered");
+      return json(SENT, 200);
+    }
 
+    if (elapsed < MIN_FILL_MS) {
+      console.warn("Contact submitted too fast:", { elapsed });
+      return json(SENT, 200);
+    }
+
+    const spam = spamReason({ name, email, message });
+
+    if (spam) {
+      console.warn("Contact spam filter triggered:", { reason: spam });
+      return json(SENT, 200);
+    }
+
+    if (!(await acceptsMail(emailDomain(email)))) {
+      console.warn("Contact email domain has no mail server");
       return json(
-        {
-          success: true,
-          message: "Your message has been sent. Thank you!",
-        },
-        200,
+        { error: "This email address can't receive mail. Please check it." },
+        400,
       );
     }
 
@@ -330,20 +352,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Send from this same Cloudflare Worker.
+    // 4. Per-sender limit, so rotating IPs can't flood from one address.
+    const senderLimit = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(2, "1 d"),
+      prefix: "portfolio:contact:email",
+    });
+
+    const sender = await senderLimit.limit(email.toLowerCase());
+
+    if (!sender.success) {
+      console.warn("Contact sender limit reached");
+      return json(SENT, 200);
+    }
+
+    // 5. Send from this same Cloudflare Worker.
     await sendEmail(config, {
       name,
       email,
       message,
     });
 
-    return json(
-      {
-        success: true,
-        message: "Your message has been sent. Thank you!",
-      },
-      200,
-    );
+    return json(SENT, 200);
   } catch (error) {
     console.error("Contact request failed:", {
       name: error instanceof Error ? error.name : "Unknown",

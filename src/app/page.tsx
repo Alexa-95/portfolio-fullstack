@@ -24,6 +24,7 @@ import {
   textLink,
   titleStar,
 } from "@/lib/styles";
+import { EmailLink } from "@/components/email-link";
 
 const headingRowText =
   "max-w-[285px] text-base leading-[1.9] text-muted max-phone:mt-[19px]";
@@ -382,12 +383,11 @@ export default function Home() {
                 Have a project in mind, a question, or just want to say hello?
                 I&apos;d love to hear from you.
               </p>
-              <a
+              <EmailLink
+                user={profile.emailUser}
+                domain={profile.emailDomain}
                 className="flex w-max max-w-full items-center gap-3 border-b border-line-wine pb-[9px] text-base wrap-anywhere"
-                href={`mailto:${profile.email}`}
-              >
-                {profile.email} <ArrowUpRight size={18} />
-              </a>
+              />
               <div className="mt-[57px] w-max animate-[rotate_45s_linear_infinite] text-deco leading-none text-wine-light max-phone:hidden">
                 ✳
               </div>

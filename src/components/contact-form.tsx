@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { buttonDark, mono } from "@/lib/styles";
@@ -18,6 +18,10 @@ export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [feedback, setFeedback] = useState("");
   const captcha = useRef<TurnstileInstance>(null);
+  const shownAt = useRef(0);
+  useEffect(() => {
+    shownAt.current = Date.now();
+  }, []);
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (loading || !token) return;
@@ -50,6 +54,7 @@ export function ContactForm() {
           message,
           company,
           token,
+          elapsed: Date.now() - shownAt.current,
         }),
       });
       const result: { error?: string; message?: string; success?: boolean } =
@@ -62,6 +67,7 @@ export function ContactForm() {
       setEmail("");
       setMessage("");
       setCompany("");
+      shownAt.current = Date.now();
     } catch (error) {
       setStatus("error");
       setFeedback(

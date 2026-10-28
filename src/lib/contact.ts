@@ -6,5 +6,7 @@ export const contactSchema = z.strictObject({
   // Honeypot: checked in the route so bots get a silent "success".
   company: z.string().max(500),
   token: z.string().min(1).max(2048),
+  // Time-trap: ms between the form appearing and submit.
+  elapsed: z.number().int().min(0).max(86_400_000),
 });
 export type ContactPayload = z.infer<typeof contactSchema>;
