@@ -158,6 +158,7 @@ export function ContactForm() {
         </p>
       )}
       <button
+        id="contact-form-submit"
         type="submit"
         className={`${buttonDark} mt-6 w-full justify-between`}
         disabled={loading || !token || !siteKey}
