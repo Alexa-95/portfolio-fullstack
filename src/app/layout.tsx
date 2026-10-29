@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { GoogleTagManager } from '@next/third-parties/google';
+import { GoogleTagManager, GoogleTagManagerNoScript } from '@/components/google-tag-manager';
 import { Cormorant_Garamond, DM_Sans, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
 
@@ -19,5 +19,5 @@ export const metadata: Metadata = {
   },
 };
 export default function RootLayout({children}:{children:React.ReactNode}) {
-  return <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable} scroll-smooth leading-[normal] motion-reduce:scroll-auto`}>{gtmId && <GoogleTagManager gtmId={gtmId} />}<body className="bg-ivory text-ink antialiased selection:bg-rose-pale selection:text-wine">{children}</body></html>;
+  return <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable} scroll-smooth leading-[normal] motion-reduce:scroll-auto`}>{gtmId && <head><GoogleTagManager gtmId={gtmId} /></head>}<body className="bg-ivory text-ink antialiased selection:bg-rose-pale selection:text-wine">{gtmId && <GoogleTagManagerNoScript gtmId={gtmId} />}{children}</body></html>;
 }
