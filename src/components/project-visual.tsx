@@ -2,15 +2,15 @@ import Image from "next/image";
 
 const shots: Record<string, { src: string; alt: string }> = {
   "loan-calculator": {
-    src: "/projects/loan-calculator.png",
+    src: "/projects/loan-calculator.webp",
     alt: "Zrzut ekranu kalkulatora kredytowego",
   },
   brewing: {
-    src: "/projects/brewing-beer-app.png",
+    src: "/projects/brewing-beer-app.webp",
     alt: "Zrzut ekranu aplikacji Brewing Beer App",
   },
   chapterly: {
-    src: "/projects/chapterly.png",
+    src: "/projects/chapterly.webp",
     alt: "Zrzut ekranu aplikacji Chapterly",
   },
 };
