@@ -4,6 +4,8 @@ const devEval = process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : '';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Inline the (small) Tailwind stylesheet as <style> so it doesn't block first render
+  experimental: { inlineCss: true },
   async headers() {
     return [{source: '/:path*', headers: [
       {key:'X-Content-Type-Options', value:'nosniff'},

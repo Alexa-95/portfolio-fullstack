@@ -1,7 +1,20 @@
 'use client';
-import { motion, useReducedMotion } from 'motion/react';
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
+
+// CSS transition toggled by an IntersectionObserver: it only writes a class and never
+// reads layout, so it can't force a synchronous reflow (unlike the motion-based version).
 export function Reveal({children, className='', delay=0}:{children:ReactNode; className?:string; delay?:number}){
-  const reduce = useReducedMotion();
-  return <motion.div className={className} initial={reduce ? false : {opacity:0,y:24}} whileInView={{opacity:1,y:0}} viewport={{once:true,amount:0.14}} transition={{duration:0.7,delay,ease:[0.22,1,0.36,1]}}>{children}</motion.div>;
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      el.classList.add('is-revealed');
+      io.disconnect();
+    }, {threshold:0.14});
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return <div ref={ref} className={`reveal ${className}`} style={{'--reveal-delay':`${delay}s`} as CSSProperties}>{children}</div>;
 }

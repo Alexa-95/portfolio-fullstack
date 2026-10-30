@@ -19,8 +19,26 @@ export function ContactForm() {
   const [feedback, setFeedback] = useState("");
   const captcha = useRef<TurnstileInstance>(null);
   const shownAt = useRef(0);
+  const captchaSlot = useRef<HTMLDivElement>(null);
+  // Turnstile's script measures the page on load (forced reflow), so only mount it
+  // once the form is close to the viewport instead of during the initial page load.
+  const [captchaVisible, setCaptchaVisible] = useState(false);
   useEffect(() => {
     shownAt.current = Date.now();
+  }, []);
+  useEffect(() => {
+    const el = captchaSlot.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setCaptchaVisible(true);
+        io.disconnect();
+      },
+      { rootMargin: "300px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -141,15 +159,17 @@ export function ContactForm() {
         />
       </div>
       {siteKey ? (
-        <div className="mt-6 min-h-[55px]">
-          <Turnstile
-            ref={captcha}
-            siteKey={siteKey}
-            options={{ theme: "light", size: "flexible", action: "contact" }}
-            onSuccess={setToken}
-            onExpire={() => setToken("")}
-            onError={() => setToken("")}
-          />
+        <div ref={captchaSlot} className="mt-6 min-h-[55px]">
+          {captchaVisible && (
+            <Turnstile
+              ref={captcha}
+              siteKey={siteKey}
+              options={{ theme: "light", size: "flexible", action: "contact" }}
+              onSuccess={setToken}
+              onExpire={() => setToken("")}
+              onError={() => setToken("")}
+            />
+          )}
         </div>
       ) : (
         <p className="mt-4 text-sm text-error">
