@@ -9,6 +9,10 @@ const shots: Record<string, { src: string; alt: string }> = {
     src: "/projects/brewing-beer-app.webp",
     alt: "Zrzut ekranu aplikacji Brewing Beer App",
   },
+  moodflow: {
+    src: "/projects/moodflow.webp",
+    alt: "Zrzut ekranu aplikacji MoodFlow",
+  },
   chapterly: {
     src: "/projects/chapterly.webp",
     alt: "Zrzut ekranu aplikacji Chapterly",
